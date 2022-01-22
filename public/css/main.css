@@ -121,7 +121,7 @@ div input, div button { font-size: 1.5rem; }
   background-repeat: no-repeat;
   background-size: 100% 100%;
   padding: 25px 28px 15px;
-  width: 600px;
+  width: 80%;
   height: 400px;
   margin: 3rem auto;
 }
@@ -205,7 +205,7 @@ div input, div button { font-size: 1.5rem; }
 }
 
 .mintBtnsBlock .mintBtn {
-  width: 240px;
+  width: 10rem;
   display: block;
   margin-left: 20px;
   text-transform: none;
