@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Cat & Mouse game (CnM)</title>
+    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.slim.js" integrity="sha256-HwWONEZrpuoh951cQD1ov2HUK5zA5DwJ1DNUXaM6FsY=" crossorigin="anonymous"></script>
+    <script type="module" src="./js/main.js"></script>
+    <link rel="stylesheet" href="./css/main.css" />
+  </head>
+
+  <body>
+    <div class="content">
+      <div style="display: flex;">
+        <div class="cheddar">
+          <article class="chedTitle">$CHEDDAR</article>
+          <article class="chedBody">$<span id="chedAmount">0</span></article>
+        </div>
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABAsAAAFbCAYAAACzjAfnAAAACXBIWXMAAAsTAAALEwEAmpwYAAAFyGlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNi4wLWMwMDUgNzkuMTY0NTkwLCAyMDIwLzEyLzA5LTExOjU3OjQ0ICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOnhtcE1NPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIiB4bWxuczpzdEV2dD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlRXZlbnQjIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtbG5zOnBob3Rvc2hvcD0iaHR0cDovL25zLmFkb2JlLmNvbS9waG90b3Nob3AvMS4wLyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgMjIuMSAoV2luZG93cykiIHhtcDpDcmVhdGVEYXRlPSIyMDIxLTEyLTI0VDAyOjQ2OjIzLTA1OjAwIiB4bXA6TWV0YWRhdGFEYXRlPSIyMDIxLTEyLTI0VDAyOjQ2OjIzLTA1OjAwIiB4bXA6TW9kaWZ5RGF0ZT0iMjAyMS0xMi0yNFQwMjo0NjoyMy0wNTowMCIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDpkZmU2N2NlZC1lYWZjLWQ2NGYtYmU4Mi1kMGQ0ZThiNTg1MjEiIHhtcE1NOkRvY3VtZW50SUQ9ImFkb2JlOmRvY2lkOnBob3Rvc2hvcDo5NmI4NGJkYS01OTU5LTliNGEtODBjYi05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AACCsgAAAAAIygIAAAAgKAsAAACAoCwAAAAAgrIAAAAACMoCAAAAICgLAAAAgDBbFnz54589Me999e25AAAAAMeae18/9Y6/uCwAAAAAxqUsAAAAAIKyAAAAAAiXfvLra2fTvHL16oXz0TfPRQAAAIBtTd/FS97n53oBv1kAAAAABGUBAAAAEJQFAAAAQFhUFnz54EEEAAAAaEPJO73fLAAAAACCsgAAAAAIygIAAAAgKAsAAACAUFQWTIcjPMwrV69GPvrmuQgAAADwdKbv2tN38bn39d3KAgAAAKBfygIAAAAgKAsAAACAsFpZcNEZBnMBAACAUS15bz41o6C6sgAAAADog7IAAAAACMoCAAAAIGxWFpyaYfDatWvnMt2L8cMffF9ERERERESky0zfgefek/eaUbBbWQAAAAC0SVkAAAAABGUBAAAAEJQFAAAAQHhYFnxvmg/v3j17NC9cvhwpUTKE4dOPPxERERERERHpMlu9S09N3+mn7/xzvYDfLAAAAACCsgAAAAAIygIAAAAgPK4seOIMg5+++OJTBwAAAHiyNd6/F8woWFwWAAAAAINSFgAAAABBWQAAAACEpWVB7Gd45/btsy3y+buZD+5/ISIiIiIiItJlpu/AW71rny2YUVBaFgAAAACDUBYAAAAAQVkAAAAABGUBAAAAEP4LOjjQSFjDMA4AAAAASUVORK5CYII=" class="title">
+      </div>
+      <div class="session">
+        <span id="address"></span>
+        <div id="btnLoginBlock"><button id="btnLogin"></button></div>
+      </div>
+      <div class="blocks">
+        <div class="mintBlock">
+          <article class="mintArticle"><div class="mintTitle">ADOPTION</div><div class="mintDesc"><p>Mice,</p><p>Cats,</p><p>Cat Ladies</p></div></article>
+          <article class="mintPrice" id="mintPriceCnm"></article>
+          <div class="mintAmountBlock">
+            <span class="cursorPointer" id="subCnmBtn">-</span>
+            <article class="mintAmount" id="mintCnmAmount">1</article>
+            <span class="cursorPointer" id="addCnmBtn">+</span>
+          </div>
+          <div class="mintBtnsBlock">
+            <div class="mintBtns">
+              <button type="button" class="mintBtn" id="mintCnmBtn"><span>Mint</span></button>
+              <button type="button" class="mintBtn" id="mintStakeCnmBtn"><span>Mint + Stake</span></button>
+            </div>
+          </div>
+          <div>
+            <article class="currentPriceBlock">Current Price : <span class="currentPrice" id="currentPriceCnm"></span>$<span id="mintTokenCnm"></span></article>
+          </div>
+        </div>
+        <div class="mintBlock">
+          <article class="mintArticle"><div class="mintTitle">REAL ESTATE</div><div class="mintDesc"><p>Shacks,</p><p>Ranches,</p><p>Mansions</p></div></article>
+          <article class="mintPrice" id="mintPriceHouse"></article>
+          <div class="mintAmountBlock">
+            <span class="cursorPointer" id="subHouseBtn">-</span>
+            <article class="mintAmount" id="mintHouseAmount">1</article>
+            <span class="cursorPointer" id="addHouseBtn">+</span>
+          </div>
+          <div class="mintBtnsBlock">
+            <div class="mintBtns">
+              <button type="button" class="mintBtn" id="mintHouseBtn"><span>Mint</span></button>
+              <button type="button" class="mintBtn" id="mintStakeHouseBtn"><span>Mint + Stake</span></button>
+            </div>
+          </div>
+          <div>
+            <article class="currentPriceBlock">Current Price : <span class="currentPrice" id="currentPriceHouse"></span>$CHEDDAR</article>
+          </div>
+        </div>
+        <div class="mintBlock">
+          <article class="mintArticle"><div class="mintTitle">STAKE</div><div class="mintDesc"><p>Mice,</p><p>Cats,</p><p>Cat Ladies</p></div></article>
+          <div class="tokenId"><input type="number" id="stakeCnmTokenId" /></div>
+          <div class="mintBtnsBlock">
+            <div class="mintBtns">
+              <button type="button" class="mintBtn" id="stakeCnmBtn"><span>Stake</span></button>
+            </div>
+          </div>
+        </div>
+        <div class="mintBlock">
+          <article class="mintArticle"><div class="mintTitle">STAKE</div><div class="mintDesc"><p>Shacks,</p><p>Ranches,</p><p>Mansions</p></div></article>
+          <div class="tokenId"><input type="number" id="stakeHouseTokenId" /></div>
+          <div class="mintBtnsBlock">
+            <div class="mintBtns">
+              <button type="button" class="mintBtn" id="stakeHouseBtn"><span>Stake</span></button>
+            </div>
+          </div>
+        </div>
+        <div class="mintBlock">
+          <article class="mintArticle"><div class="mintTitle">CLAIM</div><div class="mintDesc"><p>Mice,</p><p>Cats,</p><p>Cat Ladies</p></div></article>
+          <div class="tokenId"><input type="number" id="claimCnmTokenId" /></div>
+          <div class="mintBtnsBlock">
+            <div class="mintBtns">
+              <button type="button" class="mintBtn" id="claimCnmBtn"><span>Claim</span></button>
+            </div>
+          </div>
+        </div>
+        <div class="mintBlock">
+          <article class="mintArticle"><div class="mintTitle">CLAIM</div><div class="mintDesc"><p>Shacks,</p><p>Ranches,</p><p>Mansions</p></div></article>
+          <div class="tokenId"><input type="number" id="claimHouseTokenId" /></div>
+          <div class="mintBtnsBlock">
+            <div class="mintBtns">
+              <button type="button" class="mintBtn" id="claimHouseBtn"><span>Claim</span></button>
+            </div>
+          </div>
+        </div>
+        <div class="mintBlock">
+          <article class="mintArticle"><div class="mintTitle">UNSTAKE</div><div class="mintDesc"><p>Mice,</p><p>Cats,</p><p>Cat Ladies</p></div></article>
+          <div class="tokenId"><input type="number" id="unstakeCnmTokenId" /></div>
+          <div class="mintBtnsBlock">
+            <div class="mintBtns">
+              <button type="button" class="mintBtn" id="unstakeCnmBtn"><span>Unstake</span></button>
+            </div>
+          </div>
+        </div>
+        <div class="mintBlock">
+          <article class="mintArticle"><div class="mintTitle">UNSTAKE</div><div class="mintDesc"><p>Shacks,</p><p>Ranches,</p><p>Mansions</p></div></article>
+          <div class="tokenId"><input type="number" id="unstakeHouseTokenId" /></div>
+          <div class="mintBtnsBlock">
+            <div class="mintBtns">
+              <button type="button" class="mintBtn" id="unstakeHouseBtn"><span>Unstake</span></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="loading">
+      <img src="./images/loading.gif">
+    </div>
+  </body>
+</html>

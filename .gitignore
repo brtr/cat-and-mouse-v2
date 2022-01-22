@@ -1,0 +1,7 @@
+.env
+node_modules
+artifacts
+.deps
+cache
+package-lock.json
+.DS_Store
