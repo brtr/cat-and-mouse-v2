@@ -5,7 +5,7 @@ import { cnmGameAddress, cnmNFTAddress, cheddarAddress, cnmGameABI, cnmNFTABI, c
     let loginAddress = localStorage.getItem("loginAddress");
     let targetCnmIds = [];
     let targetHouseIds = [];
-    let currentPriceCnm, currentPriceHouse, mintPriceCnm, mintPriceHouse;
+    let currentPriceCnm, currentPriceHouse, mintPriceCnm, mintPriceHouse, hasCnmPending, hasHousePending;
     let mintCnmAmount = 1;
     let mintHouseAmount = 1;
     const TargetChain = {
@@ -17,9 +17,11 @@ import { cnmGameAddress, cnmNFTAddress, cheddarAddress, cnmGameABI, cnmNFTABI, c
     const signer = provider.getSigner();
     const cnmNFTContract = new ethers.Contract(cnmNFTAddress, cnmNFTABI, provider);
     const cnmGameContract = new ethers.Contract(cnmGameAddress, cnmGameABI, provider);
+    const cnmGameWithSigner = cnmGameContract.connect(signer);
     const houseNFTContract = new ethers.Contract(houseNFTAddress, houseNFTABI, provider);
     const CheddarContract = new ethers.Contract(cheddarAddress, cheddarABI, provider);
     const houseGameContract = new ethers.Contract(houseGameAddress, houseGameABI, provider);
+    const houseGameWithSigner = houseGameContract.connect(signer);
     const habitatContract = new ethers.Contract(HabitatAddress, HabitatABI, provider);
     const habitatWithSigner = habitatContract.connect(signer);
 
@@ -29,19 +31,6 @@ import { cnmGameAddress, cnmNFTAddress, cheddarAddress, cnmGameABI, cnmNFTABI, c
         const errMsg = err.error ? err.error.message : err.message;
         alert('Error:  ' + errMsg.split(": ")[-1]);
         $("#loading").toggle();
-    }
-
-    function reset() {
-        mintCnmAmount = 1;
-        mintHouseAmount = 1
-        targetCnmIds = [];
-        targetHouseIds = [];
-        $("#mintCnmAmount").text(mintCnmAmount);
-        $("#mintHouseAmount").text(mintHouseAmount);
-        getCurrentPrice();
-        if (loginAddress) {
-            getCheddarBalance();
-        }
     }
 
     async function checkChainId () {
@@ -125,31 +114,59 @@ import { cnmGameAddress, cnmNFTAddress, cheddarAddress, cnmGameABI, cnmNFTABI, c
         $("#mintPriceHouse").text(mintPriceHouse);
     }
 
+    const checkPendingMint = async function() {
+        hasCnmPending = await cnmGameContract.hasMintPending(loginAddress);
+
+        if (hasCnmPending) {
+            $("#revealCnmBtn").show();
+            $("#mintCnmBtn, #mintStakeCnmBtn").hide();
+        } else {
+            $("#revealCnmBtn").hide();
+            $("#mintCnmBtn, #mintStakeCnmBtn").show();
+        }
+
+        hasHousePending = await houseGameContract.hasMintPending(loginAddress);
+
+        if (hasHousePending) {
+            $("#revealHouseBtn").show();
+            $("#mintHouseBtn, #mintStakeHouseBtn").hide();
+        } else {
+            $("#revealHouseBtn").hide();
+            $("#mintHouseBtn, #mintStakeHouseBtn").show();
+        }
+    }
+
+    const reveal = async function(type) {
+        $("#loading").toggle();
+        let contractSigner = type == "cnm" ? cnmGameWithSigner : houseGameWithSigner;
+        let tx = await contractSigner.mintReveal();
+        await tx.wait();
+        console.log("mint reveal receipt: ", tx);
+        alert("Mint success");
+        location.reload();
+    }
+
     const mint = async function(stake, type) {
         try {
             $("#loading").toggle();
-            let contractSigner, tx;
+            let tx;
             if (type == "cnm") {
                 const claimable = await cnmNFTContract.isClaimable();
                 const price = claimable ? 0 : mintPrice;
-                contractSigner = cnmGameContract.connect(signer);
-                tx = await contractSigner.mintCommit(mintCnmAmount, stake, {value: ethers.utils.parseUnits(price.toString(), "ether")});
+                tx = await cnmGameWithSigner.mintCommit(mintCnmAmount, stake, {value: ethers.utils.parseUnits(price.toString(), "ether")});
+                await tx.wait();
+                console.log("mint commit receipt: ", tx);
+                location.reload();
             } else {
-                contractSigner = houseGameContract.connect(signer);
-                tx = await contractSigner.mintCommit(mintHouseAmount, stake, {value: "0"});
+                tx = await houseGameWithSigner.mintCommit(mintHouseAmount, stake, {value: "0"});
+                await tx.wait();
+                console.log("mint commit receipt: ", tx);
+                location.reload();
             }
-            await tx.wait();
-            console.log("mint commit receipt: ", tx);
-            await $(window).delay(20000).promise();
-            tx = await contractSigner.mintReveal();
-            await tx.wait();
-            console.log("mint reveal receipt: ", tx);
-
-            $("#loading").toggle();
-            alert("Mint success");
-            reset();
+            alert("Mint commit success, please reveal after 5 mins");
         } catch (err) {
             fetchErrMsg(err);
+            location.reload();
         }
     }
 
@@ -171,6 +188,7 @@ import { cnmGameAddress, cnmNFTAddress, cheddarAddress, cnmGameABI, cnmNFTABI, c
             alert("Stake success");
         } catch (err) {
             fetchErrMsg(err);
+            location.reload();
         }
     }
 
@@ -192,12 +210,14 @@ import { cnmGameAddress, cnmNFTAddress, cheddarAddress, cnmGameABI, cnmNFTABI, c
             alert("Claim success");
         } catch (err) {
             fetchErrMsg(err);
+            location.reload();
         }
     }
 
     if (window.ethereum) {
         checkChainId();
         checkLogin();
+        checkPendingMint();
 
         $("#btnLogin").on('click', function() {
             $("#loading").toggle();
@@ -211,6 +231,10 @@ import { cnmGameAddress, cnmNFTAddress, cheddarAddress, cnmGameABI, cnmNFTABI, c
 
         $("#mintStakeCnmBtn").on('click', function() {
             mint(true, "cnm");
+        })
+
+        $("#revealCnmBtn").on('click', function() {
+            reveal("cnm");
         })
 
         $("#stakeCnmBtn").on('click', function() {
@@ -248,6 +272,10 @@ import { cnmGameAddress, cnmNFTAddress, cheddarAddress, cnmGameABI, cnmNFTABI, c
 
         $("#mintStakeHouseBtn").on('click', function() {
             mint(true, "house");
+        })
+
+        $("#revealHouseBtn").on('click', function() {
+            reveal("house");
         })
 
         $("#stakeHouseBtn").on('click', function() {
