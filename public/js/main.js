@@ -9,8 +9,8 @@ import { cnmGameAddress, cnmNFTAddress, cheddarAddress, cnmGameABI, cnmNFTABI, c
     let mintCnmAmount = 1;
     let mintHouseAmount = 1;
     const TargetChain = {
-        id: "5",
-        name: "goerli"
+        id: "56",
+        name: "bsc"
     };
 
     const provider = new ethers.providers.Web3Provider(web3.currentProvider);
@@ -152,7 +152,7 @@ import { cnmGameAddress, cnmNFTAddress, cheddarAddress, cnmGameABI, cnmNFTABI, c
             let tx;
             if (type == "cnm") {
                 const claimable = await cnmNFTContract.isClaimable();
-                const price = claimable ? 0 : mintPrice;
+                const price = claimable ? 0 : mintPriceCnm;
                 tx = await cnmGameWithSigner.mintCommit(mintCnmAmount, stake, {value: ethers.utils.parseUnits(price.toString(), "ether")});
                 await tx.wait();
                 console.log("mint commit receipt: ", tx);
@@ -198,10 +198,10 @@ import { cnmGameAddress, cnmNFTAddress, cheddarAddress, cnmGameABI, cnmNFTABI, c
             let tx;
             if (type == "cnm") {
                 targetCnmIds.push(tokenId);
-                tx = await habitatWithSigner.claimManyFromHabitatAndYield(targetIds, unstake);
+                tx = await habitatWithSigner.claimManyFromHabitatAndYield(targetCnmIds, unstake);
             } else {
                 targetHouseIds.push(tokenId);
-                tx = await habitatWithSigner.claimManyHouseFromHabitat([tokenId], unstake);
+                tx = await habitatWithSigner.claimManyHouseFromHabitat(targetHouseIds, unstake);
             }
 
             await tx.wait();
@@ -238,15 +238,15 @@ import { cnmGameAddress, cnmNFTAddress, cheddarAddress, cnmGameABI, cnmNFTABI, c
         })
 
         $("#stakeCnmBtn").on('click', function() {
-            stake($("#stakeTokenId").val(), "cnm");
+            stake($("#stakeCnmTokenId").val(), "cnm");
         })
 
         $("#claimCnmBtn").on('click', function() {
-            claim($("#claimTokenId").val(), false, "cnm");
+            claim($("#claimCnmTokenId").val(), false, "cnm");
         })
 
         $("#unstakeCnmBtn").on('click', function() {
-            claim($("#unstakeTokenId").val(), true, "cnm");
+            claim($("#unstakeCnmTokenId").val(), true, "cnm");
         })
 
         $("#addCnmBtn").on('click', function() {
@@ -279,15 +279,15 @@ import { cnmGameAddress, cnmNFTAddress, cheddarAddress, cnmGameABI, cnmNFTABI, c
         })
 
         $("#stakeHouseBtn").on('click', function() {
-            stake($("#stakeTokenId").val(), "house");
+            stake($("#stakeHouseTokenId").val(), "house");
         })
 
         $("#claimHouseBtn").on('click', function() {
-            claim($("#claimTokenId").val(), false, "house");
+            claim($("#claimHouseTokenId").val(), false, "house");
         })
 
         $("#unstakeHouseBtn").on('click', function() {
-            claim($("#unstakeTokenId").val(), true, "house");
+            claim($("#unstakeHouseTokenId").val(), true, "house");
         })
 
         $("#addHouseBtn").on('click', function() {
